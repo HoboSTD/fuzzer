@@ -13,20 +13,17 @@ class PlainText(Strategy):
         super().__init__()
 
     def set_sample(self, sample: Sample) -> None:
+        """
+        Splits the plaintext up into lines that use the overflow strategy.
+        """
         super().set_sample(sample)
-        # split it up into new lines
+
         lines = self._sample._input.splitlines()
 
-        self._lines: List[Overflow] = []
-        # get each one to be a buffer overflow strategy
-        for i in range(0, len(lines)):
-            self._lines.append(Overflow(lines[i]))
+        self._lines: List[Overflow] = [Overflow(lines[i]) for i in range(0, len(lines))]
 
     def get_input(self) -> bytes:
-        ret = b""
-        for line in self._lines:
-            ret = b"".join([ret, line.get_input(), b"\n"])
-        return ret
+        return b"\n".join([line.get_input() for line in self._lines])
 
     def get_keywords(self) -> List[bytes]:
         return [b"\n", b"\x00", b"\r\n", b"\t", b"\b", b"%s"]

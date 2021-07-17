@@ -10,7 +10,7 @@ class Overflow(Strategy):
     
     def __init__(self, base: bytes) -> None:
         self._base = base
-        self._mult = 0
+        self._mult = 1
 
     def get_input(self) -> bytes:
         """
@@ -21,7 +21,7 @@ class Overflow(Strategy):
         if rand == 0:
             return self._base
         elif rand == 1:
-            self._mult += 1
+            self._mult *= 2
             return self._base * self._mult
         elif rand == 2:
             return self._mult * b"%s"
