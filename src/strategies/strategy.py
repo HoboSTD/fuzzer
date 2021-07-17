@@ -10,7 +10,7 @@ class Strategy():
     def __init__(self) -> None:
         pass
 
-    def set_sample(self, sample: Sample) -> Sample:
+    def set_sample(self, sample: Sample) -> None:
         self._sample = sample
 
     def get_input(self) -> bytes:
