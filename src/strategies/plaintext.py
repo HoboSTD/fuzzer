@@ -13,3 +13,5 @@ class PlainText(Strategy):
     def get_input(self) -> bytes:
         return super().get_input()
 
+    def get_keywords(self) -> List[bytes]:
+        return [b"\n", b"\x00", b"\r\n", b"\t", b"\b", b"%s"]

@@ -1,8 +1,6 @@
 """
-Interface that all the other sample types follow.
+Holds the sample input and other stuff.
 """
-
-from typing import List
 
 class Sample():
 
@@ -13,7 +11,3 @@ class Sample():
     def load_file(self) -> None:
         with open(self._path) as file:
             self._input: bytes = file.read().encode("utf-8")
-
-    def get_keywords(self) -> List[bytes]:
-        pass
-
