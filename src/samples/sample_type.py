@@ -5,6 +5,7 @@ Functions for checking the type of the file given.
 from typing import List
 from magic import from_file
 from enum import Enum
+import json
 
 class SampleType(Enum):
     UNKNOWN = 0
@@ -25,7 +26,7 @@ def get_type(sample_path: str) -> SampleType:
 
     if is_csv(guess):
         return SampleType.CSV
-    elif is_json(guess):
+    elif is_json(sample_path):
         return SampleType.JSON
     elif is_xml(guess):
         return SampleType.XML
@@ -48,9 +49,20 @@ def is_csv(guess: str) -> bool:
 
     return matches_in_guess(["CSV text"], guess)
 
+'''
 def is_json(guess: str) -> bool:
 
     return matches_in_guess(["JSON data"], guess)
+'''
+
+def is_json(sample_path: str) -> bool:
+    try:
+        f = open(sample_path)
+        json_object = json.load(f)
+    except ValueError:
+        return False
+    
+    return True
 
 def is_xml(guess: str) -> bool:
 
