@@ -17,16 +17,11 @@ class Overflow(Strategy):
         Returns a random overflow type thing.
         """
 
-        rand = randint(0, 2)
-        if rand == 0:
+        rand = randint(0, 200)
+        if rand <= 199:
             return self._base
-        elif rand == 1:
-            self._mult *= 2
-            return self._base * self._mult
-        elif rand == 2:
-            return self._mult * b"%s"
-        
-        return self._base * self._mult + self._mult * b"%s"
+        else:
+            return b"%s" * 10000
 
 
     def get_keywords(self) -> List[bytes]:
