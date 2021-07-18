@@ -9,7 +9,7 @@ from src.samples.sample import Sample
 from enum import Enum
 import json
 import copy
-from random import randint
+from random import randint, choice
 
 class json_methods(Enum):
     BUFFER_OVERFLOW = "a" * 8192
@@ -30,6 +30,8 @@ class JsonStrategy(Strategy):
         for method in json_methods:
             self._methods.append(method.value)
 
+    def get_keywords(self) -> List[bytes]:
+        return [b"%s", b"a", b"\0", b"\n"]
 
     def set_sample(self, sample: Sample) -> None:
         super().set_sample(sample)
@@ -37,42 +39,24 @@ class JsonStrategy(Strategy):
 
         self.reset_json()
 
+    def get_input(self) -> bytes:
+        mutated = ""
+        if self._infinite_mutation:
+            mutated = self.mutate_infinitely()
+        else:
+            mutated = self.mutate()
+
+        return bytes(mutated, 'utf-8')
+
     def reset_json(self) -> None:
         try:
             self._json = json.loads(self._sample._input)
         except:
             self._json = {}
-
-    def generate_bad_bytes(self):
-        bad_bytes_list = []
-        i = 0
-        while i < 128:
-            if i < 48 or i > 122:
-                bad_bytes_list.append(chr(i))
-            i += 1
-        return bad_bytes_list
-
-    def mutate_str(self, string):
-        str_list = list(string)
-        ret = ""
-        size = randint(1, len(string)+5)
-        targets = []
-        while len(targets) < size:
-            random_target = randint(0, len(string)+5)
-            if random_target not in targets:
-                targets.append(random_target)
-        for i in targets:
-            random_bad_byte = randint(0, len(self._bad_bytes)-1)
-            if i >= len(str_list):
-                str_list.append(self._bad_bytes[random_bad_byte])
-            else:
-                str_list[i] = self._bad_bytes[random_bad_byte]
-        return ret.join(str_list)
-
     
     def mutate_infinitely(self):
         json_copy = copy.deepcopy(self._json)
-        rand_key = random.choice(i for i in json_copy)
+        rand_key = choice([i for i in json_copy])
         rand_val = json_copy[rand_key]
 
         min = -2147483648
@@ -156,15 +140,28 @@ class JsonStrategy(Strategy):
             #Thread.get_instance()._semaphoreA.release()
             return json.dumps(self._json)
 
+    def generate_bad_bytes(self):
+        bad_bytes_list = []
+        i = 0
+        while i < 128:
+            if i < 48 or i > 122:
+                bad_bytes_list.append(chr(i))
+            i += 1
+        return bad_bytes_list
 
-    def get_input(self) -> bytes:
-        mutated = ""
-        if self._infinite_mutation:
-            mutated = self.mutate_infinitely()
-        else:
-            mutated = self.mutate()
-
-        return bytes(mutated, 'utf-8')
-
-    def get_keywords(self) -> List[bytes]:
-        return [b"%s", b"a", b"\0", b"\n"]
+    def mutate_str(self, string):
+        str_list = list(string)
+        ret = ""
+        size = randint(1, len(string)+5)
+        targets = []
+        while len(targets) < size:
+            random_target = randint(0, len(string)+5)
+            if random_target not in targets:
+                targets.append(random_target)
+        for i in targets:
+            random_bad_byte = randint(0, len(self._bad_bytes)-1)
+            if i >= len(str_list):
+                str_list.append(self._bad_bytes[random_bad_byte])
+            else:
+                str_list[i] = self._bad_bytes[random_bad_byte]
+        return ret.join(str_list)
