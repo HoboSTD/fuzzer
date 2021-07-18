@@ -1,4 +1,4 @@
-from random import randint
+from random import randint, getrandbits
 from sys import maxsize
 
 def bitflip(b: bytes) -> bytes:
@@ -42,7 +42,7 @@ def arithmetic(b: bytes) -> bytes:
         val = 0
         while val == 0:
             val = randint(-35, 35)
-        b[i] = val
+        b[i] += val
     return bytes(b)
 
 def interestingbytes(b: bytes) -> bytes:
