@@ -6,7 +6,7 @@ from typing import List
 from src.strategies.strategy import Strategy
 from src.samples.sample import Sample
 from src.strategies.operators import bitflip, byteflip, arithmetic, interestingbytes, bytedelete, randominsert
-
+from random import randint
 
 class Generic(Strategy):
 

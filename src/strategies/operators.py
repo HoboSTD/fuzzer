@@ -6,8 +6,11 @@ def bitflip(b: bytes) -> bytes:
     Invert 1 to 4 consecutive bits
     """
     
+    if len(b) == 0:
+        return b
+
     b = bytearray(b)
-    n = randint(1, 4)
+    n = randint(1, min(4, len(b)))
     start = randint(0, len(b)*8 - n)
 
     for i in range(start, start+n):
@@ -21,6 +24,9 @@ def byteflip(b: bytes) -> bytes:
     Invert 1 to 4 consecutive bytes
     """
     
+    if len(b) == 0:
+        return b
+
     b = bytearray(b)
     n = randint(1, min(4, len(b)))
     start = randint(0,  len(b) - n)
@@ -34,6 +40,9 @@ def arithmetic(b: bytes) -> bytes:
     Performs addition and subtraction of -35 to 35 on 1 to 4 consecutive bytes
     """
     
+    if len(b) == 0:
+        return b
+
     b = bytearray(b)
     n = randint(1, min(4, len(b)))
     start = randint(0,  len(b) - n)
@@ -42,7 +51,12 @@ def arithmetic(b: bytes) -> bytes:
         val = 0
         while val == 0:
             val = randint(-35, 35)
-        b[i] += val
+        if b[i] + val < 0:
+            b[i] = 0
+        elif b[i] + val > 255:
+            b[i] = 255
+        else:
+            b[i] += val
     return bytes(b)
 
 def interestingbytes(b: bytes) -> bytes:
@@ -50,6 +64,9 @@ def interestingbytes(b: bytes) -> bytes:
     Randomly replace 1 to 4 consecutive bytes with interesting values
     """
     
+    if len(b) == 0:
+        return b
+
     b = bytearray(b)
     n = randint(1, min(4, len(b)))
     start = randint(0,  len(b) - n)
@@ -67,6 +84,9 @@ def bytedelete(b: bytes) -> bytes:
     Randomly delete 1 to 4 consecutive bytes
     """
     
+    if len(b) == 0:
+        return b
+
     b = bytearray(b)
     n = randint(1, min(4, len(b)))
     start = randint(0,  len(b) - n)
@@ -84,7 +104,7 @@ def randominsert(b: bytes) -> bytes:
     n = randint(1, 4)
     start = randint(0,  len(b))
 
-    rand = bytearray((random.getrandbits(8) for i in range(n)))
+    rand = bytearray((getrandbits(8) for i in range(n)))
     b[start:start] = rand
     
     return bytes(b)
