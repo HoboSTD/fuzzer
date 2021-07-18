@@ -34,7 +34,6 @@ class JsonStrategy(Strategy):
 
     def set_sample(self, sample: Sample) -> None:
         super().set_sample(sample)
-        # split it up into new lines
 
         self.reset_json()
 
