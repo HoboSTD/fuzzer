@@ -7,6 +7,7 @@ from src.samples.sample_type import SampleType, get_type
 from src.strategies.strategy import Strategy
 from src.strategies.plaintext import PlainText
 from src.strategies.csv import Csv
+from src.strategies.json import JsonStrategy
 
 def get_strategy(sample_path: str) -> Strategy:
 
@@ -15,6 +16,10 @@ def get_strategy(sample_path: str) -> Strategy:
 
     if type == SampleType.CSV:
         strategy = Csv()
+        strategy.set_sample(sample)
+        return strategy
+    elif type == SampleType.JSON:
+        strategy = JsonStrategy()
         strategy.set_sample(sample)
         return strategy
     else:
