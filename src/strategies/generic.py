@@ -2,6 +2,7 @@
 Handles plaintext inputs.
 """
 
+from random import randint
 from typing import List
 from src.strategies.strategy import Strategy
 from src.samples.sample import Sample
