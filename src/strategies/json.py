@@ -34,16 +34,11 @@ class JsonStrategy(Strategy):
 
     def set_sample(self, sample: Sample) -> None:
         super().set_sample(sample)
-        # split it up into new lines
 
         self.reset_json()
 
     def get_input(self) -> bytes:
-        mutated = ""
-        if self._state == 4:
-            mutated = self.mutate_infinitely()
-        else:
-            mutated = self.mutate()
+        mutated = self.mutate_machine()
 
         return bytes(mutated, 'utf-8')
 
@@ -79,7 +74,7 @@ class JsonStrategy(Strategy):
 
 
 
-    def mutate(self):
+    def mutate_machine(self):
 
         # try overflow/fmt if we haven't already
         if self._state == 0:
@@ -92,58 +87,60 @@ class JsonStrategy(Strategy):
                 self._state = 1
                 #print("NEW STATE", self._state)
             return json.dumps(copy_json)
-        else:
+        elif self._state == 1:
             append_byte = choice(self._bytes_list)
-
-            if self._state == 1:
-                found = False
-                for key in self._json:
-                    val = self._json[key]
-                    if isinstance(val, str):
-                        if len(val) < 200:
-                            found = True
-                        self._json[key] = val + append_byte
-                    elif isinstance(val, int):
-                        if val == 0:
-                            val = 1
-                        if len(str(val)) < 20:
-                            found = True
-                        self._json[key] = val*-2
-                    elif isinstance(val, list):
-                        for y in range(len(val)):
-                            if isinstance(val[y], str):
-                                if len(val[y]) < 200:
-                                    found = True
-                                    val[y] = val[y] + append_byte
-                            if isinstance(val[y], int):
-                                if val[y] == 0:
-                                    val[y] = 1
-                                if len(str(val[y])) < 20:
-                                    found = True
-                                    val[y] = val[y]*-2
-                        if len(val) < 1000:
-                            sqrt = (100 - len(val))//2
-                            for i in range(0, sqrt):
-                                val.append("a")
-                            for i in range(sqrt, 1000):
-                                val.append(randint(-10, 10))
-                if not found:
-                    self._state = 2
-                    #print("NEW STATE", self._state)
-            elif self._state == 2:
-                for i in range(0, 50):
-                    self._json[f"add{i}"] = 'a'
-                for i in range(50, 100):
-                    self._json[f"add{i}"] = randint(-10, 10)
-
-                self._state = 3
+            found = False
+            for key in self._json:
+                val = self._json[key]
+                if isinstance(val, str):
+                    if len(val) < 200:
+                        found = True
+                    self._json[key] = val + append_byte
+                elif isinstance(val, int):
+                    if val == 0:
+                        val = 1
+                    if len(str(val)) < 20:
+                        found = True
+                    self._json[key] = val*-2
+                elif isinstance(val, list):
+                    for y in range(len(val)):
+                        if isinstance(val[y], str):
+                            if len(val[y]) < 200:
+                                found = True
+                                val[y] = val[y] + append_byte
+                        if isinstance(val[y], int):
+                            if val[y] == 0:
+                                val[y] = 1
+                            if len(str(val[y])) < 20:
+                                found = True
+                                val[y] = val[y]*-2
+                    if len(val) < 1000:
+                        sqrt = (100 - len(val))//2
+                        for i in range(0, sqrt):
+                            val.append("a")
+                        for i in range(sqrt, 1000):
+                            val.append(randint(-10, 10))
+            if not found:
+                self._state = 2
                 #print("NEW STATE", self._state)
-            elif self._state == 3:
-                self.reset_json()
+        elif self._state == 2:
+            for i in range(0, 50):
+                self._json[f"add{i}"] = 'a'
+            for i in range(50, 100):
+                self._json[f"add{i}"] = randint(-10, 10)
 
-                self._state = 4
-                #print("NEW STATE", self._state)
-            return json.dumps(self._json)
+            self._state = 3
+            #print("NEW STATE", self._state)
+        elif self._state == 3:
+            self.reset_json()
+
+            self._state = 4
+            #print("NEW STATE", self._state)
+        elif self._state == 4:
+            return self.mutate_infinitely()
+
+        
+        return json.dumps(self._json)
 
     def generate_bad_bytes(self):
         bad_bytes_list = []
