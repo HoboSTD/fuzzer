@@ -13,7 +13,7 @@ class Generic(Strategy):
 
     def __init__(self) -> None:
         super().__init__()
-        self._state = 0
+        self._state = 6
         self._state_progress = 0
 
     def get_keywords(self) -> List[bytes]:
@@ -68,6 +68,10 @@ class Generic(Strategy):
             else:
                 self.next_state()
         elif self._state == 6:
+            self._state_progress += 1
+            if self._state_progress > 5:
+                self._testcase = self._sample._input
+
             choice = randint(1, 6)
             if choice == 1:
                 self._testcase = bitflip(self._testcase)
