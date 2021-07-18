@@ -66,5 +66,21 @@ class Generic(Strategy):
                 return randominsert(self._testcase)
             else:
                 self.next_state()
-        
+        elif self._state == 6:
+            choice = randint(1, 6)
+            if choice == 1:
+                self._testcase = bitflip(self._testcase)
+            elif choice == 2:
+                self._testcase = byteflip(self._testcase)
+            elif choice == 3:
+                self._testcase = arithmetic(self._testcase)
+            elif choice == 4:
+                self._testcase = interestingbytes(self._testcase)
+            elif choice == 5:
+                self._testcase = bytedelete(self._testcase)
+            elif choice == 6:
+                self._testcase = randominsert(self._testcase)
+
+            return self._testcase
+
         return None
