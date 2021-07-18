@@ -87,7 +87,14 @@ class CsvIntegerCell(CsvCell):
 def create_cell(input: bytes) -> CsvCell:
     """Returns a CsvCell based on what the input is"""
 
-    if input.isdigit():
+    def is_int() -> bool:
+        try:
+            int(input.decode("utf-8"))
+            return True
+        except:
+            return False
+
+    if is_int():
         return CsvIntegerCell(input)
     
     return CsvCell(input)
