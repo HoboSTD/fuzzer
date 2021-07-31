@@ -9,5 +9,5 @@ class Sample():
         self.load_file()
 
     def load_file(self) -> None:
-        with open(self._path) as file:
-            self._input: bytes = file.read().encode("utf-8")
+        with open(self._path, "rb") as file:
+            self._input: bytes = file.read()

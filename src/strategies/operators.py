@@ -108,3 +108,22 @@ def randominsert(b: bytes) -> bytes:
     b[start:start] = rand
     
     return bytes(b)
+    
+def copyinsert(b: bytes) -> bytes:
+    """
+    Copy 1 to n consecutive bytes and insert into a random location
+    """
+    
+    if len(b) == 0:
+        return b
+    
+    b = bytearray(b)
+    
+    n = randint(1, len(b))
+    src_start = randint(0,  len(b) - n)
+    copied = b[src_start:src_start+n]
+
+    dest_start = randint(0,  len(b))
+    b[dest_start:dest_start] = copied
+    
+    return bytes(b)

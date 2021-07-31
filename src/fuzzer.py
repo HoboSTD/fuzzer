@@ -2,6 +2,8 @@
 The fuzzer.
 """
 
+from src.strategies.generic import Generic
+from typing import List
 from src.strategies.strategy import Strategy
 from src.strategies.create_strategy import get_strategy
 from src.samples.sample import Sample
@@ -14,6 +16,8 @@ class Fuzzer():
         self._strategy: Strategy = get_strategy(sample_path)
         self._strategy.set_sample(self._sample)
         self._stop_fuzzing: bool = False
+        self._generic: Generic = Generic()
+        self._generic.set_sample(self._sample)
 
     def fuzz(self) -> bytes:
         """
@@ -22,6 +26,10 @@ class Fuzzer():
 
         if self._stop_fuzzing:
             return None
+
+        input = self._generic.get_input()
+        if input != None:
+             return input
     
         return self._strategy.get_input()
 
@@ -35,5 +43,5 @@ class Fuzzer():
 
             print("Found input that causes segmentation fault.")
 
-            with open("bad.txt", "w") as file:
-                file.write(input.decode("utf-8"))
+            with open("bad.txt", "wb") as file:
+                file.write(input)
