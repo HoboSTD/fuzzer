@@ -3,8 +3,9 @@ Generates random strings that are used during fuzzing.
 """
 
 from random import randint
+from src.parameters.parameter import Parameter
 
-class String():
+class String(Parameter):
 
     def __init__(self, base: bytes) -> None:
         self._base: bytes = base

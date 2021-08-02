@@ -3,8 +3,9 @@ Generates random integers that are used during fuzzing.
 """
 
 from random import randint
+from src.parameters.parameter import Parameter
 
-class Integer():
+class Integer(Parameter):
 
     def __init__(self) -> None:
         self._int_max = 2**30
