@@ -12,4 +12,7 @@ chmod +x fuzzer
 ```
 chmod +x test
 ./test
+
+chmod +x fuzzer-test.sh
+./fuzzer-test.sh
 ```
