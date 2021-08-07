@@ -39,4 +39,4 @@ class Job():
         Runs the binary with the given output and returns the program's exit code.
         """
         
-        return run(["./" + self._binary_path], input=input, capture_output=True).returncode
+        return run(["timeout", "5", "./" + self._binary_path], input=input, capture_output=True).returncode

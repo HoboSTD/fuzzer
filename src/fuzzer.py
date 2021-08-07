@@ -19,7 +19,12 @@ class Fuzzer():
         self._generic: Generic = Generic()
         self._generic.set_sample(self._sample)
         self.ninputs: int = 0
-        self.reports: List[Report] = [Report("success"), Report("exit()"), Report("abort()")]
+        self.reports: List[Report] = [
+            Report("success"),
+            Report("exit()"),
+            Report("abort()"),
+            Report("hang"),
+            Report("other")]
 
     def fuzz(self) -> bytes:
         """
@@ -38,6 +43,7 @@ class Fuzzer():
     def print_reports(self):
         for report in self.reports:
             print(report.message())
+        print()
 
     def analyse(self, returncode: int, input: bytes) -> None:
         """
@@ -63,6 +69,10 @@ class Fuzzer():
 
             with open("bad.txt", "wb") as file:
                 file.write(input)
+        elif returncode == 124:
+            self.reports[3].inc_count()
+        else:
+            self.reports[4].inc_count()
 
 class Report():
     

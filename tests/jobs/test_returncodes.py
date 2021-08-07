@@ -10,6 +10,7 @@ from src.jobs.job import Job
     ("binaries/test/exit-status", 1),
     ("binaries/test/segfault", -11),
     ("binaries/test/normal", 0),
+    ("binaries/test/hang", 124),
 ])
 def test_exitcode(path: str, returncode: int):
     job = Job(None, path)
