@@ -2,6 +2,7 @@
 The fuzzer.
 """
 
+from time import time
 from src.strategies.generic import Generic
 from typing import List
 from src.strategies.strategy import Strategy
@@ -25,6 +26,7 @@ class Fuzzer():
             Report("abort()"),
             Report("hang"),
             Report("other")]
+        self.start: float = time()
 
     def fuzz(self) -> bytes:
         """
@@ -43,6 +45,20 @@ class Fuzzer():
     def print_reports(self):
         for report in self.reports:
             print(report.message())
+    
+    def print_inputs_a_sec(self):
+        
+        try:
+            inputs_sec = self.ninputs / (time() - self.start)
+            print(f"{inputs_sec:.2f} inputs/sec")
+        except:
+            pass
+    
+    def report(self):
+        print("-"*80)
+        self.print_inputs_a_sec()
+        self.print_reports()
+        print("-"*80)
         print()
 
     def analyse(self, returncode: int, input: bytes) -> None:
@@ -52,7 +68,7 @@ class Fuzzer():
 
         self.ninputs += 1
         if self.ninputs % 250 == 0:
-            self.print_reports()
+            self.report()
 
         if returncode == 0:
             self.reports[0].inc_count()
@@ -63,7 +79,7 @@ class Fuzzer():
         elif returncode == -11:
             self._stop_fuzzing = True
 
-            self.print_reports()
+            self.report()
 
             print("Found input that causes segmentation fault.")
 
