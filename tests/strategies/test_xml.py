@@ -82,3 +82,14 @@ def test_parse_xml_3():
 
     print(xmlTag.get_xml())
     assert xmlTag.get_xml() == xml
+
+def test_xml_fuzz():
+
+
+    xml = b"<html><head><a href=\"https://www.google.com\"></a></head><link a=\"test\" /></html>"
+    xmlTag = parse_xml(xml)
+
+    for _ in range(1, 50):
+        print(xmlTag.fuzz())
+
+    assert 1 == 0

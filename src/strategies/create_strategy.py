@@ -8,6 +8,7 @@ from src.strategies.strategy import Strategy
 from src.strategies.plaintext import PlainText
 from src.strategies.csv import Csv
 from src.strategies.json import JsonStrategy
+from src.strategies.xml import XMLStrategy
 
 def get_strategy(sample_path: str) -> Strategy:
 
@@ -20,6 +21,10 @@ def get_strategy(sample_path: str) -> Strategy:
         return strategy
     elif type == SampleType.JSON:
         strategy = JsonStrategy()
+        strategy.set_sample(sample)
+        return strategy
+    elif type == SampleType.XML:
+        strategy = XMLStrategy()
         strategy.set_sample(sample)
         return strategy
     else:

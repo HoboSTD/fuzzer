@@ -170,8 +170,9 @@ class Generic(Strategy):
             max_changes = 5
             self._state_progress += 1
             if self._state_progress > max_changes:
-                self._testcase = self._sample._input
-                self._state_progress = 0
+                # self._testcase = self._sample._input
+                # self._state_progress = 0
+                self.next_state()
 
             choice = randint(1, 7)
             if choice == 1:

@@ -29,7 +29,7 @@ class Fuzzer():
 
         input = self._generic.get_input()
         if input != None:
-             return input
+            return input
     
         return self._strategy.get_input()
 
