@@ -83,6 +83,7 @@ def test_parse_xml_3():
     print(xmlTag.get_xml())
     assert xmlTag.get_xml() == xml
 
+"""
 def test_xml_fuzz():
 
 
@@ -93,3 +94,4 @@ def test_xml_fuzz():
         print(xmlTag.fuzz())
 
     assert 1 == 0
+"""
