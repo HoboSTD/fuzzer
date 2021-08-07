@@ -18,6 +18,8 @@ class Fuzzer():
         self._stop_fuzzing: bool = False
         self._generic: Generic = Generic()
         self._generic.set_sample(self._sample)
+        self.ninputs: int = 0
+        self.reports: List[Report] = [Report("success"), Report("exit()"), Report("abort()")]
 
     def fuzz(self) -> bytes:
         """
@@ -33,15 +35,43 @@ class Fuzzer():
     
         return self._strategy.get_input()
 
+    def print_reports(self):
+        for report in self.reports:
+            print(report.message())
+
     def analyse(self, returncode: int, input: bytes) -> None:
         """
         Anaylses the output.
         """
 
-        if returncode == -11:
+        self.ninputs += 1
+        if self.ninputs % 250 == 0:
+            self.print_reports()
+
+        if returncode == 0:
+            self.reports[0].inc_count()
+        elif returncode > 0:
+            self.reports[1].inc_count()
+        elif returncode == -6:
+            self.reports[2].inc_count()
+        elif returncode == -11:
             self._stop_fuzzing = True
+
+            self.print_reports()
 
             print("Found input that causes segmentation fault.")
 
             with open("bad.txt", "wb") as file:
                 file.write(input)
+
+class Report():
+    
+    def __init__(self, code: str) -> None:
+        self.count = 0
+        self.code = code
+
+    def inc_count(self):
+        self.count += 1
+    
+    def message(self):
+        return f"Error type: {self.code} has happened {self.count} times."
