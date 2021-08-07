@@ -22,9 +22,9 @@ class Fuzzer():
         self.ninputs: int = 0
         self.reports: List[Report] = [
             Report("success"),
+            Report("hang"),
             Report("exit()"),
             Report("abort()"),
-            Report("hang"),
             Report("other")]
         self.start: float = time()
         self.last_report: float = time()
@@ -77,10 +77,12 @@ class Fuzzer():
 
         if returncode == 0:
             self.reports[0].inc_count()
-        elif returncode > 0:
+        elif returncode == 124:
             self.reports[1].inc_count()
-        elif returncode == -6:
+        elif returncode > 0:
             self.reports[2].inc_count()
+        elif returncode == -6:
+            self.reports[3].inc_count()
         elif returncode == -11:
             self._stop_fuzzing = True
 
@@ -90,8 +92,6 @@ class Fuzzer():
 
             with open("bad.txt", "wb") as file:
                 file.write(input)
-        elif returncode == 124:
-            self.reports[3].inc_count()
         else:
             self.reports[4].inc_count()
 
