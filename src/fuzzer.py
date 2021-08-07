@@ -27,6 +27,7 @@ class Fuzzer():
             Report("hang"),
             Report("other")]
         self.start: float = time()
+        self.last_report: float = time()
 
     def fuzz(self) -> bytes:
         """
@@ -54,12 +55,17 @@ class Fuzzer():
         except:
             pass
     
-    def report(self):
+    def report(self, time_between = 2):
+
+        if time() - self.last_report < time_between:
+            return
+
         print("-"*80)
         self.print_inputs_a_sec()
         self.print_reports()
         print("-"*80)
         print()
+        self.last_report = time()
 
     def analyse(self, returncode: int, input: bytes) -> None:
         """
@@ -67,8 +73,7 @@ class Fuzzer():
         """
 
         self.ninputs += 1
-        if self.ninputs % 250 == 0:
-            self.report()
+        self.report()
 
         if returncode == 0:
             self.reports[0].inc_count()
@@ -79,7 +84,7 @@ class Fuzzer():
         elif returncode == -11:
             self._stop_fuzzing = True
 
-            self.report()
+            self.report(-1)
 
             print("Found input that causes segmentation fault.")
 
