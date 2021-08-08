@@ -221,16 +221,22 @@ class XMLTag():
                 ret += b">"
             return ret
 
-        def include_massive_nesting(level, do_random = False) -> bytes:
-            if level <= 0:
+        def include_massive_nesting(depth: int) -> bytes:
+
+            if randint(1, 50) != 50:
                 return b""
 
-            if not do_random and randint(1, 50) != 50:
-                return b""
+            open_tag = b"<"
+            open_tag += self._tag
+            open_tag += b">"
 
-            ret = include_opening_tag()
-            ret += include_massive_nesting(level - 1)
-            ret += include_closing_tag()
+            close_tag = b"</"
+            close_tag += self._tag
+            close_tag += b">"
+
+            ret = open_tag * depth
+            ret += close_tag * depth
+
             return ret
 
 
@@ -240,7 +246,7 @@ class XMLTag():
             return xml
         xml += include_children()
         xml += include_content()
-        xml += include_massive_nesting(500, True)
+        xml += include_massive_nesting(50000)
         xml += include_closing_tag()
         return xml
 
