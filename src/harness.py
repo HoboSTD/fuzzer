@@ -3,6 +3,7 @@ Harness the.
 """
 
 from multiprocessing import cpu_count
+from threading import Timer
 from typing import List
 from src.jobs.job import Job
 from src.fuzzer import Fuzzer
@@ -27,3 +28,18 @@ class Harness():
             job = Job(self._fuzzer, self._binary_path)
             job.start()
             self._jobs.append(job)
+        
+        # start a timer that kills all the jobs after 179 seconds
+        self._timer = Timer(179.0, self.kill_all)
+        self._timer.daemon = True
+        self._timer.start()
+
+    def kill_all(self):
+        """
+        Kills all the jobs after a certain amount of seconds have elapsed.
+        """
+
+        for job in self._jobs:
+            job.kill()
+        
+        self._jobs.clear()
