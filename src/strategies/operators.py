@@ -1,7 +1,7 @@
 from random import randint, getrandbits
 from sys import maxsize
 
-def bitflip(b: bytes) -> bytes:
+def bitflip(b: bytes, start: int = -1) -> bytes:
     """
     Invert 1 to 4 consecutive bits
     """
@@ -11,15 +11,19 @@ def bitflip(b: bytes) -> bytes:
 
     b = bytearray(b)
     n = randint(1, min(4, len(b)))
-    start = randint(0, len(b)*8 - n)
+    if start == -1:
+        start = randint(0, len(b)*8 - n)
 
     for i in range(start, start+n):
         base = int(i // 8)
         shift = int(i % 8)
+
+        if base >= len(b):
+            break
         b[base] ^= (1 << (7-shift))
     return bytes(b)
 
-def byteflip(b: bytes) -> bytes:
+def byteflip(b: bytes, start: int = -1) -> bytes:
     """
     Invert 1 to 4 consecutive bytes
     """
@@ -29,9 +33,12 @@ def byteflip(b: bytes) -> bytes:
 
     b = bytearray(b)
     n = randint(1, min(4, len(b)))
-    start = randint(0,  len(b) - n)
+    if start == -1:
+        start = randint(0,  len(b) - n)
 
     for i in range(start, start+n):
+        if i >= len(b):
+            break
         b[i] ^= 0xFF
     return bytes(b)
 
@@ -109,7 +116,7 @@ def randominsert(b: bytes) -> bytes:
     
     return bytes(b)
     
-def copyinsert(b: bytes) -> bytes:
+def copyinsert(b: bytes, do_stretch: bool = False) -> bytes:
     """
     Copy 1 to n consecutive bytes and insert into a random location
     """
@@ -123,7 +130,32 @@ def copyinsert(b: bytes) -> bytes:
     src_start = randint(0,  len(b) - n)
     copied = b[src_start:src_start+n]
 
+    if do_stretch:
+        copied *= randint(1,  100)
+
     dest_start = randint(0,  len(b))
     b[dest_start:dest_start] = copied
+    
+    return bytes(b)
+
+def stretch_at_random(b: bytes) -> bytes:
+    """
+    Stretches 1 to n consecutive bytes at a random location, to 1 to 100 new copies.
+    Similar to a copyinsert, but doesn't insert at a random location
+    """
+    
+    if len(b) == 0:
+        return b
+    
+    b = bytearray(b)
+    
+    n = randint(1, len(b))
+    src_start = randint(0,  len(b) - n)
+    copied = b[src_start:src_start+n]
+
+    # stretch
+    copied *= randint(1,  100)
+
+    b[src_start:src_start] = copied
     
     return bytes(b)
