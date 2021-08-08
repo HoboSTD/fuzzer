@@ -18,3 +18,113 @@ The harness only executes a single job at a time.
 The fuzzer can only fuzz json, csv and plaintext files. The fuzzer can be improved by adding
 functionality to fuzz more file types such as PDFs, XMLs and so on.
 It can fuzz csv2 as well.
+
+# Documentation
+
+## How the fuzzer works
+
+The fuzzer first determines the file type and then selects a strategy based on the file type. If
+no file type can be determined then the plaintext strategy is used.
+
+Jobs take an input from the fuzzer by calling `fuzzer.fuzz()`. They then execute the binary using
+this input. The job then calls `fuzzer.analyse(returncode, input)` after the binary is executed.
+
+The fuzzer checks the returncode to determine what caused the crash: either it returned 0 and so was
+successful, returned 124 which means the program hung, returned something greater than 0 which means
+the program exited or returned -6 which means the program aborted.
+
+### Parameters
+
+These parameters are used to generate fuzzed values based on their type. This makes it easier to
+generate fuzzed values in each strategy.
+
+#### Integer
+
+This generates random integers in the range [-2^30, 2^30].
+
+#### String
+
+This either returns the original value or returns a string with a bunch of "%s"s. This attempts to
+find format string or buffer overflow vulnerabilities.
+
+#### List
+
+This returns a list of parameters. Each of these parameters is either an integer, string or list.
+They are fuzzed each time the list is fuzzed.
+
+### Generic
+
+[TODO]
+
+### Plaintext
+
+The plaintext strategy splits the sample input into lines and then creates a parameter based on the
+line's type.
+
+Each generated input combines all the fuzzed parameters (joined with new lines).
+
+### JSON
+
+[TODO]
+
+### CSV
+
+The csv strategy converts the sample input into a 2d array where each cell is a parameter.
+
+Each generated input combines all the fuzzed cells into a valid csv format. This is so that the
+generic strategy can perform operatings like bit-flipping to mess with the csv structure.
+
+### XML
+
+The xml strategy converts the sample input into a tree where each node has a tag, a list of
+attributes and a list of children.
+
+Each generated input messes with the xml in the following way:
+
+- changing the tag name.
+- not including an opening tag.
+- massively increasing the number of attributes.
+- fuzzing the attribute structure.
+- fuzzing the attribute's name or value.
+- not including child nodes.
+- massively increasing the number of child nodes.
+- including fuzzed string for the node's content.
+- generating lots of nested tags.
+- not including a closing tag.
+
+This means that the structure and values of the xml are all fuzzed.
+
+### JPG
+
+### Harness
+
+The harness creates a list of jobs that each exist in their own thread. These jobs take input from
+the fuzzer and test it against the binary. The return code of the program is then given back to the
+fuzzer, along with the input that caused it.
+
+Each job lets the binary execute for 5 seconds before it is killed.
+
+After 180 seconds the harness kills all the jobs.
+
+## What bugs can be found
+
+The fuzzer can find buffer overflow vulnerabilities and format string vulnerabilities.
+
+## Improvements
+
+### Code Coverage and Coverage based mutations
+
+The fuzzer does not analyse the code coverage of the program. Because of this it can't do coverage
+based mutation either.
+
+### Avoiding overheads
+
+The fuzzer doesn't create extra files but it still uses `execve()` to run the binary.
+
+Our approach to in memory resetting was going to be forking the process before it received input.
+
+### ELF and PDF
+
+The fuzzer doesn't understand ELF and PDF formats.
+
+## Something Awesome
