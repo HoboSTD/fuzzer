@@ -54,7 +54,18 @@ They are fuzzed each time the list is fuzzed.
 
 ### Generic
 
-[TODO]
+The "Generic" strategy is used against all input formats prior to their format-specific strategies.
+This is because the strategy uses a set of common operations that don't rely on the input being of a specific format e.g. JSON, XML.
+
+Operations which are included in the fuzzing process:
+ - Bit flip - inverts n consecutive bits.
+ - Byte flip - inverts n consecutive bytes.
+ - Arithmetic - performs addition and subtraction on n consecutive bytes..
+ - Interesting bytes - randomly replaces n consecutive bytes with interesting values e.g. 0, 0xFF, 0x7F.
+ - Byte delete - randomly deletes n consecutive bytes.
+ - Random insert - insert n consecutive random bytes, at a random location.
+ - Copy insert - copies 1-n consecutive bytes from a random location, and inserts at another random location.
+ - Stretch - selects a random location and stretches 1-n bytes there, to a certain length.
 
 ### Plaintext
 
@@ -65,7 +76,24 @@ Each generated input combines all the fuzzed parameters (joined with new lines).
 
 ### JSON
 
-[TODO]
+This strategy mainly focuses on manipulating the JSON structures such as keys and values.
+It does not attempt to fuzz any syntactical related bugs.
+
+The current JSON fuzzing process is as follows:
+
+1. 
+    - Change every value in the JSON object to a very large string - buffer overflow vulnerabilities.
+    - Change every value to a large string containing "%s" - fmt string vulnerabilities.
+2.
+    - For every value of string type, append interesting bytes on each iteration.
+    - For every value of integer type, double the number and change the sign on each iteration.
+    - For every value of list type, do the above for every element in that list, and also append more elements.
+    - Stop this process when each value gets very large.
+3.
+    - Add new key-value pairs to the root of the JSON - values are strings and integers.
+4.
+    - Recursively mutate the entire JSON object with random values.
+    - Do this indefinitely.
 
 ### CSV
 
@@ -108,7 +136,7 @@ After 180 seconds the harness kills all the jobs.
 
 ## What bugs can be found
 
-The fuzzer can find buffer overflow vulnerabilities and format string vulnerabilities.
+The fuzzer has found buffer overflow vulnerabilities and format string vulnerabilities, but it may also be possible to find other vulns i.e. heap based.
 
 ## Improvements
 
