@@ -138,7 +138,7 @@ After 180 seconds the harness kills all the jobs.
 
 The fuzzer has found buffer overflow vulnerabilities and format string vulnerabilities, but it may also be possible to find other vulns i.e. heap based.
 
-## Improvements
+## Future Improvements
 
 ### Code Coverage and Coverage based mutations
 
@@ -154,5 +154,11 @@ Our approach to in memory resetting was going to be forking the process before i
 ### ELF and PDF, and more
 
 The fuzzer doesn't understand ELF, PDF, etc formats.
+
+### Segfault input compression
+
+Sometimes the input we have used to crash the program is quite complex and large, this can be quite troublesome when it comes to actually fixing the vulnerability, as it is unclear which part of the input caused the crash.
+Using a bruteforce technique, it may be trivial to compress the input, whilst still retaining the property that causes the crash.
+Once then input can't be reduced any futher, we save this instead as it's easier to debug.
 
 ## Something Awesome
