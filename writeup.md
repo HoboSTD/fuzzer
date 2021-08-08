@@ -24,7 +24,7 @@ It can fuzz csv2 as well.
 ## How the fuzzer works
 
 The fuzzer first determines the file type and then selects a strategy based on the file type. If
-no file type can be determined then the plaintext strategy is used.
+no file type can be determined, then the plaintext strategy is chosen as the format-specific strategy. It then runs the generic fuzzing strategy against the input, and then uses the format-specific fuzzing strategy that was selected. 
 
 Jobs take an input from the fuzzer by calling `fuzzer.fuzz()`. They then execute the binary using
 this input. The job then calls `fuzzer.analyse(returncode, input)` after the binary is executed.
@@ -52,7 +52,7 @@ find format string or buffer overflow vulnerabilities.
 This returns a list of parameters. Each of these parameters is either an integer, string or list.
 They are fuzzed each time the list is fuzzed.
 
-### Generic
+### Generic Fuzzing Strategy
 
 The "Generic" strategy is used against all input formats prior to their format-specific strategies.
 This is because the strategy uses a set of common operations that don't rely on the input being of a specific format e.g. JSON, XML.
@@ -67,14 +67,14 @@ Operations which are included in the fuzzing process:
  - Copy insert - copies 1-n consecutive bytes from a random location, and inserts at another random location.
  - Stretch - selects a random location and stretches 1-n bytes there, to a certain length.
 
-### Plaintext
+### Plaintext Fuzzing Strategy
 
 The plaintext strategy splits the sample input into lines and then creates a parameter based on the
 line's type.
 
 Each generated input combines all the fuzzed parameters (joined with new lines).
 
-### JSON
+### JSON Fuzzing Strategy
 
 This strategy mainly focuses on manipulating the JSON structures such as keys and values.
 It does not attempt to fuzz any syntactical related bugs.
@@ -95,14 +95,14 @@ The current JSON fuzzing process is as follows:
     - Recursively mutate the entire JSON object with random values.
     - Do this indefinitely.
 
-### CSV
+### CSV Fuzzing Strategy
 
 The csv strategy converts the sample input into a 2d array where each cell is a parameter.
 
 Each generated input combines all the fuzzed cells into a valid csv format. This is so that the
 generic strategy can perform operatings like bit-flipping to mess with the csv structure.
 
-### XML
+### XML Fuzzing Strategy
 
 The xml strategy converts the sample input into a tree where each node has a tag, a list of
 attributes and a list of children.
@@ -122,7 +122,7 @@ Each generated input messes with the xml in the following way:
 
 This means that the structure and values of the xml are all fuzzed.
 
-### JPG
+### JPG Fuzzing Strategy
 
 ### Harness
 
@@ -130,7 +130,7 @@ The harness creates a list of jobs that each exist in their own thread. These jo
 the fuzzer and test it against the binary. The return code of the program is then given back to the
 fuzzer, along with the input that caused it.
 
-Each job lets the binary execute for 5 seconds before it is killed.
+Each job lets the binary execute for 5 seconds before it is killed, this is a heuristic we use to detect if the program is stuck in an infinite loop.
 
 After 180 seconds the harness kills all the jobs.
 
@@ -151,8 +151,8 @@ The fuzzer doesn't create extra files but it still uses `execve()` to run the bi
 
 Our approach to in memory resetting was going to be forking the process before it received input.
 
-### ELF and PDF
+### ELF and PDF, and more
 
-The fuzzer doesn't understand ELF and PDF formats.
+The fuzzer doesn't understand ELF, PDF, etc formats.
 
 ## Something Awesome
