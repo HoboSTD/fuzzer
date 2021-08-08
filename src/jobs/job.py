@@ -11,6 +11,7 @@ class Job():
     def __init__(self, fuzzer: Fuzzer, binary_path: str) -> None:
         self._fuzzer: Fuzzer = fuzzer
         self._binary_path: str = binary_path
+        self._continue: bool = True
 
     def start(self):
         """
@@ -26,7 +27,7 @@ class Job():
         """
 
         input = self._fuzzer.fuzz()
-        while input != None:
+        while input != None and self._continue:
 
             returncode = self.execute(input)
 
@@ -40,3 +41,11 @@ class Job():
         """
         
         return run(["timeout", "5", "./" + self._binary_path], input=input, capture_output=True).returncode
+
+    def kill(self):
+        """
+        Kills the attached thread.
+        """
+
+        if self._thread.is_alive():
+            self._continue = False
