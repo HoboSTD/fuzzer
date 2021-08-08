@@ -297,7 +297,7 @@ def parse_xml(xml: bytes) -> XMLTag:
             parent.add_child(tag)
             stack.append(parent)
             i = j + 2
-        elif current_tag[0] == 47:
+        elif len(current_tag) > 0 and current_tag[0] == 47:
             # it's a closing tag
             top = stack.pop()
             # print("popped:", top._tag)
